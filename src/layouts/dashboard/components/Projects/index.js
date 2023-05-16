@@ -66,7 +66,7 @@ function Projects(props) {
 
 const requestPdfFiller = (e) => {
   
-  fetch('http://192.168.1.21:3000/archivo/formularioSolicitud/obtener', {
+  fetch('http://137.184.125.192:3000/archivo/formularioSolicitud/obtener', {
      method: 'POST',
      body: JSON.stringify({
       "razonSocial": e.nombre,
