@@ -45,11 +45,14 @@ function Projects(props) {
   const openMenu = ({ currentTarget }) => setMenu(currentTarget);
   const closeMenu = () => setMenu(null);
   const [products, setProducts] = useState([]);
+  const [cliente, setCliente] = useState([]);
+  const [electri, setElectri] = useState([]);
+  const [instalacion, setInstalacion] = useState([]);
   const columns = [
-      {field: 'nombre', header: 'Nombre'},
-      {field: 'email', header: 'Correo'},
-      {field: 'telefono', header: 'Telefono'},
-      {field: 'nit', header: 'Nit'},
+      {field: 'cliente.nombre', header: 'Nombre'},
+      {field: 'estado', header: 'Estado'},
+      {field: 'instalacionId', header: 'id deInstalacion'},
+      {field: 'electricista[0].nombre', header: 'Electricista'},
       {field: 'createdAt', header: 'Fecha de Creacion'},
   
       
@@ -59,22 +62,44 @@ function Projects(props) {
   ];
 
   useEffect(() => {
-    fetch('http://137.184.125.192:3000/cliente/todos')
+    fetch('http://137.184.125.192:3000/solicitud/todos')
     .then(response => response.json())
     .then(data => setProducts(data.data));
 }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-const requestPdfFiller = (e) => {
-  
-  fetch('http://137.184.125.192:3000/archivo/formularioSolicitud/obtener', {
+const requestPdfFiller = async (e) => {
+  console.log("el cliente")
+  console.log(cliente);
+  console.log("el elect")
+  console.log(electri);
+  console.log("la instalacio")
+  console.log(instalacion);
+  fetch('http://137.184.125.192:3000/archivo/formularioSolicitud/obtener/soli', {
      method: 'POST',
      body: JSON.stringify({
-      "razonSocial": e.nombre,
+      "razonSocial": cliente.nombre,
       "nit" : e.nit,
       "ncr" : e.nrc,
      "actividadEconomica" : e.act_economica,
       "email":e.email,
-      "telefono":e.telefono
+      "telefono":e.telefono,
+      "namele":e.electricista[0].nombre,
+      "docele":e.nombre,
+      "mailele":e.nombre,
+      "registroele":e.nombre,
+      "phonele":e.nombre,
+      "proyecname":e.nombre,
+      tensionelec
+      cargasoli
+      numtab
+      numhojas
+      clasi
+      numtrans
+      subcon
+      subcap
+      capgen
+      numnivel
+      numserv
      }),
      headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -90,6 +115,27 @@ const requestPdfFiller = (e) => {
      });
 };
 
+const traerInstalacion = async (id) => {
+  
+  fetch('http://137.184.125.192:3000/instalacion/porID/'+id)
+  .then(response => response.json())
+  .then(data => setInstalacion(data.data));
+};
+
+const traerCliente = async (id) => {
+  
+  fetch('http://137.184.125.192:3000/cliente/porId/'+id)
+  .then(response => response.json())
+  .then(data => setCliente(data.data));
+};
+
+const traerelectricista = async (id) => {
+  console.log("elec id"+id)
+  fetch('http://137.184.125.192:3000/electricista/porId/'+id)
+  .then(response => response.json())
+  .then(data => setElectri(data.data));
+};
+
 function downloadPDF(pdf,e) {
   const linkSource = `data:application/pdf;base64,${pdf}`;
   const downloadLink = document.createElement("a");
@@ -100,9 +146,12 @@ function downloadPDF(pdf,e) {
   downloadLink.click();
 }
 
-const imprimir = (e) =>{
+const imprimir = async (e) =>{
   console.log(e);
-  requestPdfFiller(e);
+  traerCliente(e.clienteId);
+  traerInstalacion (e.instalacionId);
+  traerelectricista(e.electricista[0].solicitudxelectricista.electricistumId);
+  await requestPdfFiller(e);
 } 
 // no se esta usando el ojetivo era que se llenara on la informaion del liente par amostarla antes de imprimirla
 const Form = () => {
